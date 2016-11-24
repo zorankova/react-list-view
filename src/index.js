@@ -55,6 +55,12 @@ export default class ReactListView extends React.Component {
       };
     }
 
+    this.state = {
+      initialListPosition: 0,
+      initialMousePosition: 0,
+      isDragging: false
+    };
+
     this._handleScroll = this._handleScroll.bind(this);
   }
 
@@ -85,6 +91,28 @@ export default class ReactListView extends React.Component {
     );
     return [min, max];
   }
+
+  mouseMove = (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      if (this.state.isDragging) {
+          let pos = (event.pageX - this.state.initialMousePosition) + this.state.initialListPosition;
+          this.setState({scrollLeft: pos});
+      }
+  };
+
+  mouseDown = (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      this.setState({isDragging: true, initialMousePosition: event.pageX, initialListPosition: this.state.scrollLeft});
+      // console.log(this.state.leftOffset);
+  };
+  mouseUp = () => {
+      event.stopPropagation();
+      event.preventDefault();
+      console.log(this.state.leftOffset);
+      this.setState({isDragging: false});
+  };
 
   render() {
     let {
@@ -163,6 +191,9 @@ export default class ReactListView extends React.Component {
           ...style,
         }}
         onScroll={!this._isControlled && this._handleScroll}
+        onMouseUp={this.mouseUp}
+        onMouseDown={this.mouseDown}
+        onMouseMove={this.mouseMove}
       >
         <div
           className="ReactListView-container"
